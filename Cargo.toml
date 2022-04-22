@@ -1,0 +1,57 @@
+[package]
+name = "rp_pico_template"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cortex-m = "0.7.4"
+rp2040-boot2 = "0.2.0"
+rp2040-hal = "0.4.0"
+cortex-m-rt = "0.7.1"
+embedded-time = "0.12.1"
+usb-device = "0.2.8"
+usbd-serial = "0.1.1"
+usbd-hid = "0.5.2"
+futures = { version = "0.3.21", default-features = false }
+rp-pico = "0.3.0"
+embedded-hal = "0.2.7"
+panic-halt = "0.2.0"
+numtoa = "0.2.4"
+
+[[bin]]
+name = "led"
+path = "src/led.rs"
+
+[[bin]]
+name = "led_ex"
+path = "src/led_ex.rs"
+
+[[bin]]
+name = "led_ex_switch"
+path = "src/led_ex_switch.rs"
+
+[[bin]]
+name = "led_ex_pwm"
+path = "src/led_ex_pwm.rs"
+
+[[bin]]
+name = "servo_pwm_hz"
+path = "src/servo_pwm_hz.rs"
+
+[[bin]]
+name = "led_ex_timer"
+path = "src/led_ex_timer.rs"
+
+[[bin]]
+name = "serial_hello"
+path = "src/serial_hello.rs"
+
+[[bin]]
+name = "serial_number"
+path = "src/serial_number.rs"
+
+[[bin]]
+name = "serial_adc"
+path = "src/serial_adc.rs"
