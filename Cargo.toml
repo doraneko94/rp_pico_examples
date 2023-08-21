@@ -1,5 +1,5 @@
 [package]
-name = "rp_pico_template"
+name = "rp_pico_examples"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,18 +7,19 @@ edition = "2021"
 
 [dependencies]
 cortex-m = "0.7.4"
-rp2040-boot2 = "0.2.0"
-rp2040-hal = "0.4.0"
+rp2040-boot2 = "0.2.1"
+rp2040-hal = { version = "0.8.0", features = ["rt", "critical-section-impl"] }
 cortex-m-rt = "0.7.1"
 embedded-time = "0.12.1"
 usb-device = "0.2.8"
 usbd-serial = "0.1.1"
 usbd-hid = "0.5.2"
 futures = { version = "0.3.21", default-features = false }
-rp-pico = "0.3.0"
-embedded-hal = "0.2.7"
+rp-pico = "0.7.0"
+embedded-hal = { version = "0.2.7", features = ["unproven"] }
 panic-halt = "0.2.0"
 numtoa = "0.2.4"
+serial_write = "0.1.0"
 
 [[bin]]
 name = "led"
@@ -37,12 +38,12 @@ name = "led_ex_pwm"
 path = "src/led_ex_pwm.rs"
 
 [[bin]]
-name = "servo_pwm_hz"
-path = "src/servo_pwm_hz.rs"
-
-[[bin]]
 name = "led_ex_timer"
 path = "src/led_ex_timer.rs"
+
+[[bin]]
+name = "servo_pwm_hz"
+path = "src/servo_pwm_hz.rs"
 
 [[bin]]
 name = "serial_hello"
@@ -55,3 +56,7 @@ path = "src/serial_number.rs"
 [[bin]]
 name = "serial_adc"
 path = "src/serial_adc.rs"
+
+[[bin]]
+name = "ultrasonic_ranging"
+path = "src/ultrasonic_ranging.rs"

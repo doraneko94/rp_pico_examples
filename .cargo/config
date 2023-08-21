@@ -10,4 +10,3 @@ rustflags = [
 ]
 
 runner = "elf2uf2-rs -d -s"
-# runner = "elf2uf2-rs -d -s"

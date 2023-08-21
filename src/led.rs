@@ -1,47 +1,51 @@
-//! # Pico Blinky Example
+//! # GPIO 'Blinky' Example
 //!
-//! Blinks the LED on a Pico board.
+//! This application demonstrates how to control a GPIO pin on the RP2040.
 //!
-//! This will blink an LED attached to GP25, which is the pin the Pico uses for
-//! the on-board LED.
+//! It may need to be adapted to your particular board layout and/or pin assignment.
 //!
-//! This code is quoted from https://github.com/rp-rs/rp-hal/blob/main/boards/rp-pico/examples/pico_blinky.rs
+//! See the `Cargo.toml` file for Copyright and license details.
+//! 
+//! This code was quoted from https://github.com/rp-rs/rp-hal/blob/main/rp2040-hal/examples/blinky.rs
 
 #![no_std]
 #![no_main]
-
-// The macro for our start-up function
-use cortex_m_rt::entry;
-
-// GPIO traits
-use embedded_hal::digital::v2::OutputPin;
-
-// Time handling traits
-use embedded_time::rate::*;
 
 // Ensure we halt the program on panic (if we don't mention this crate it won't
 // be linked)
 use panic_halt as _;
 
-// Pull in any important traits
-use rp_pico::hal::prelude::*;
+// Alias for our HAL crate
+use rp2040_hal as hal;
 
 // A shorter alias for the Peripheral Access Crate, which provides low-level
 // register access
-use rp_pico::hal::pac;
+use hal::pac;
 
-// A shorter alias for the Hardware Abstraction Layer, which provides
-// higher-level drivers.
-use rp_pico::hal;
+// Some traits we need
+use embedded_hal::digital::v2::OutputPin;
+use rp2040_hal::clocks::Clock;
+
+/// The linker will place this boot block at the start of our program image. We
+/// need this to help the ROM bootloader get our code up and running.
+/// Note: This boot block is not necessary when using a rp-hal based BSP
+/// as the BSPs already perform this step.
+#[link_section = ".boot2"]
+#[used]
+pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_GENERIC_03H;
+
+/// External high-speed crystal on the Raspberry Pi Pico board is 12 MHz. Adjust
+/// if your board has a different frequency
+const XTAL_FREQ_HZ: u32 = 12_000_000u32;
 
 /// Entry point to our bare-metal application.
 ///
-/// The `#[entry]` macro ensures the Cortex-M start-up code calls this function
-/// as soon as all global variables are initialised.
+/// The `#[rp2040_hal::entry]` macro ensures the Cortex-M start-up code calls this function
+/// as soon as all global variables and the spinlock are initialised.
 ///
-/// The function configures the RP2040 peripherals, then blinks the LED in an
-/// infinite loop.
-#[entry]
+/// The function configures the RP2040 peripherals, then toggles a GPIO pin in
+/// an infinite loop. If there is an LED connected to that pin, it will blink.
+#[rp2040_hal::entry]
 fn main() -> ! {
     // Grab our singleton objects
     let mut pac = pac::Peripherals::take().unwrap();
@@ -51,10 +55,8 @@ fn main() -> ! {
     let mut watchdog = hal::Watchdog::new(pac.WATCHDOG);
 
     // Configure the clocks
-    //
-    // The default is to generate a 125 MHz system clock
     let clocks = hal::clocks::init_clocks_and_plls(
-        rp_pico::XOSC_CRYSTAL_FREQ,
+        XTAL_FREQ_HZ,
         pac.XOSC,
         pac.CLOCKS,
         pac.PLL_SYS,
@@ -65,27 +67,24 @@ fn main() -> ! {
     .ok()
     .unwrap();
 
-    // The delay object lets us wait for specified amounts of time (in
-    // milliseconds)
-    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().integer());
+    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
 
     // The single-cycle I/O block controls our GPIO pins
     let sio = hal::Sio::new(pac.SIO);
 
-    // Set the pins up according to their function on this particular board
-    let pins = rp_pico::Pins::new(
+    // Set the pins to their default state
+    let pins = hal::gpio::Pins::new(
         pac.IO_BANK0,
         pac.PADS_BANK0,
         sio.gpio_bank0,
         &mut pac.RESETS,
     );
 
-    // Set the LED to be an output
-    let mut led_pin = pins.led.into_push_pull_output();
-
-    // Blink the LED at 1 Hz
+    // Configure GPIO25 as an output
+    let mut led_pin = pins.gpio25.into_push_pull_output();
     loop {
         led_pin.set_high().unwrap();
+        // TODO: Replace with proper 1s delays once we have clocks working
         delay.delay_ms(500);
         led_pin.set_low().unwrap();
         delay.delay_ms(500);
