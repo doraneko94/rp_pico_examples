@@ -20,6 +20,7 @@ embedded-hal = { version = "0.2.7", features = ["unproven"] }
 panic-halt = "0.2.0"
 numtoa = "0.2.4"
 serial_write = "0.1.0"
+fugit = "0.3.7"
 
 [[bin]]
 name = "led"
@@ -56,6 +57,10 @@ path = "src/serial_number.rs"
 [[bin]]
 name = "serial_adc"
 path = "src/serial_adc.rs"
+
+[[bin]]
+name = "watchdog"
+path = "src/watchdog.rs"
 
 [[bin]]
 name = "ultrasonic_ranging"
